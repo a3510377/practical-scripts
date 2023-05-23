@@ -44,7 +44,8 @@ if __name__ == "__main__":
             else:
                 print("錯誤無法獲取該 UUID 所有者: ", uuid, r.status_code)
 
-        r = requests.get(f"https://crafatar.com/avatars/{uuid}?size=128")
+        # r = requests.get(f"https://crafatar.com/avatars/{uuid}?size=128")
+        r = requests.get(f"https://mineskin.eu/avatar/{name}")
         if r.status_code == 200:
             file = Path(f"./avatars/{name}.png")
             file.parent.mkdir(parents=True, exist_ok=True)
