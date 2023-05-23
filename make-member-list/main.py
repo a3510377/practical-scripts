@@ -6,7 +6,7 @@ ROW_LEN = 8
 COLUMN_LEN = 8
 AVATAR_SIZE = 64
 FONT_SIZE = 20
-RIGHT_PADDING = 180
+RIGHT_PADDING = 188
 BOTTOM_PADDING = 20
 
 images = list(Path("avatars").glob("*.png"))
@@ -35,7 +35,7 @@ for row in range(ROW_LEN):
         imd = ImageDraw.Draw(background)
         imd.text(
             (
-                row_width + AVATAR_SIZE + 15,
+                row_width + AVATAR_SIZE + 12,
                 column_height + AVATAR_SIZE / 2 - FONT_SIZE / 2,
             ),
             file.stem,
