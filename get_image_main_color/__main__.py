@@ -1,15 +1,17 @@
 from pathlib import Path
-import random
 from PIL import Image
 import numpy as np
 from sklearn.cluster import KMeans
+
+DEBUG = True
 
 
 def size_to_str(size: int):
     for unit in [" bytes", "KB", "MB", "GB", "TB", "PB", "EB"]:
         if size < 1024:
-            return f"{size:.2f} {unit}"
+            break
         size /= 1024
+    return f"{size:.2f} {unit}"
 
 
 def hex_color_str(colors: tuple[int, int, int]) -> str:
@@ -29,11 +31,13 @@ def extract_theme_colors(
     return k_means.cluster_centers_.astype(int).tolist()
 
 
-def together(rgba_color, threshold=15, threshold_a=0.4):
+def calc(rgba_color: tuple):
     r, g, b, a, *_ = (*rgba_color, 0xFF)
 
-    diff = max(r, g, b) - min(r, g, b)
-    return diff <= threshold and (threshold - diff) * a / 0xFF >= threshold_a
+    diff = (0.299 * r + 0.587 * g + 0.114 * b) * a / 65025
+    if DEBUG:
+        print(f"{diff: 7.2f}", end=" ")
+    return diff
 
 
 def extract_theme_color(
@@ -42,9 +46,13 @@ def extract_theme_color(
     base_colors: list[tuple[int, int, int, int]] = None,
 ) -> tuple[int, int, int, int]:
     base_colors = extract_theme_colors(image_path, num_colors)
-    colors = list(filter(together, base_colors))
+    colors = list(sorted(base_colors, key=calc))
 
-    return sorted(colors, key=sum)[-1] if colors else random.choice(base_colors[:-4])
+    if DEBUG:
+        print()
+        print(" ".join(hex_color_str(color) for color in colors))
+
+    return colors[-1]
 
 
 if __name__ == "__main__":
@@ -53,8 +61,5 @@ if __name__ == "__main__":
         if path.suffix in (".png", ".jpg"):
             print(f'image:"{path}"', size_to_str(path.stat().st_size))
 
-            print(
-                " ".join(hex_color_str(color) for color in extract_theme_colors(path))
-            )
             print(hex_color_str(extract_theme_color(path)))
             print("-" * (summon_len * 8 - 1))
