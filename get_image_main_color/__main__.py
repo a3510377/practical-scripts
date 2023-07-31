@@ -1,4 +1,5 @@
 from pathlib import Path
+import time
 from PIL import Image
 import numpy as np
 from sklearn.cluster import KMeans
@@ -94,6 +95,8 @@ if __name__ == "__main__":
     summon_len = 10
     for path in Path().glob("data/**/*"):
         if path.suffix in (".png", ".jpg"):
+            start = time.time()
             print(f'image:"{path}"', size_to_str(path.stat().st_size))
-            print(extract_theme_color(path))
+            print(extract_theme_color(path), end=" ")
+            print(f"Time: {time.time() - start:.2f} s")
             print("-" * (summon_len * 8 - 1))
