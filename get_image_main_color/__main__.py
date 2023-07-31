@@ -87,7 +87,7 @@ def extract_theme_color(
             light_color = color
         elif color.brightness > 0.2:
             return color
-    return light_color
+    return light_color or colors[0]
 
 
 if __name__ == "__main__":
