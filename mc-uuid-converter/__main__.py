@@ -50,8 +50,13 @@ def change_file(file_path: Path, new_name: str) -> None:
 
 
 def parse_file(file: Path):
-    if new_uuid := online_uuid_to_offline_uuid(uuid.UUID(file.with_suffix("").name)):
-        change_file(file, str(new_uuid))
+    try:
+        if new_uuid := online_uuid_to_offline_uuid(
+            uuid.UUID(file.with_suffix("").name)
+        ):
+            change_file(file, str(new_uuid))
+    except ValueError:
+        print(f"Invalid UUID: {file.name}")
 
 
 # remove old dat files
