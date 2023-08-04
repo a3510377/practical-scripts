@@ -24,7 +24,7 @@ def online_uuid_to_offline_uuid(online_uuid: str):
     player_name = data.get("name")
     if player_name:
         offline_uuid = name_to_offline_uuid(player_name)
-        print(f"{online_uuid}[{player_name}] -> {offline_uuid}")
+        print(f"{online_uuid}[{player_name.rjust(20, ' ')}] -> {offline_uuid}")
         player_name = offline_uuid
 
     cache[online_uuid] = player_name
