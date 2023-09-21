@@ -102,8 +102,6 @@ void loop() {
 
     update();
   }
-
-  Serial.println("--------");
 }
 
 void update() {
@@ -117,4 +115,5 @@ void update() {
     tmpLedCache >>= 8;
   }
   digitalWrite(LATCH_PIN, HIGH);
+  Serial.println("--------");
 }
