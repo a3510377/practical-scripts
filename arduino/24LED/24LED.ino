@@ -139,7 +139,6 @@ void setMod(uint8_t _mode) {
     case LEFT_TO_RIGHT:
       ledCache = 0;
       break;
-      // RIGHT_TO_LEFT
     case LEFT_SPACING_4:
       ledCache = 0x820820;
       break;
