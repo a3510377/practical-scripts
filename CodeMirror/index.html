@@ -348,6 +348,11 @@ def fibonacci(n):
               const cursor = cm.getSearchCursor(word, head);
               if (cursor.findNext()) {
                 cm.addSelection(cursor.from(), cursor.to());
+              } else {
+                const cursor = cm.getSearchCursor(word, { line: 0, ch: 0 });
+                if (cursor.findNext()) {
+                  cm.addSelection(cursor.from(), cursor.to());
+                }
               }
             } else {
               const lineText = cm.getLine(head.line);
