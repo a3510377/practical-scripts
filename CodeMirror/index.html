@@ -149,6 +149,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.20/addon/edit/matchbrackets.min.js"></script>
     <!-- 自動閉合括號 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.20/addon/edit/closebrackets.min.js"></script>
+    <!-- 搜尋函數 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/addon/search/searchcursor.min.js"></script>
 
     <script>
       document.addEventListener('DOMContentLoaded', () => {
@@ -317,11 +319,11 @@ def fibonacci(n):
                 right++;
               }
 
-              cm.setSelection(
-                { line: head.line, ch: left },
-                { line: head.line, ch: right }
-              );
+              head = { line: head.line, ch: right };
+              anchor = { line: head.line, ch: left };
+              cm.setSelection(anchor, head);
             }
+
             const word = cm.getRange(anchor, head);
             const cursor = cm.getSearchCursor(word, { line: 0, ch: 0 });
             while (cursor.findNext()) {
