@@ -16,6 +16,10 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.20/theme/dracula.min.css"
     />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.20/addon/fold/foldgutter.min.css"
+    />
 
     <style>
       html,
@@ -151,6 +155,12 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.20/addon/edit/closebrackets.min.js"></script>
     <!-- 搜尋函數 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.20/addon/search/searchcursor.min.js"></script>
+    <!-- 行高亮 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.20/addon/selection/active-line.min.js"></script>
+    <!-- 折疊程式碼 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.20/addon/fold/foldcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.20/addon/fold/foldgutter.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.20/addon/fold/indent-fold.min.js"></script>
 
     <script>
       document.addEventListener('DOMContentLoaded', () => {
@@ -173,10 +183,16 @@
           {
             mode: 'python',
             theme: 'dracula',
+            tabSize: 4,
+            indentUnit: 4,
+            foldGutter: true,
             lineNumbers: true,
+            indentWithTabs: false,
+            styleActiveLine: true,
             autoCloseBrackets: true,
             multiCursorOnClick: true,
             hintOptions: { completeSingle: false },
+            gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
             extraKeys: {
               'Ctrl-Space': (cm) => {
                 return cm.showHint({
