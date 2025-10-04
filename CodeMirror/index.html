@@ -409,9 +409,22 @@ def fibonacci(n):
           };
         };
 
+        const debounce = (func, delay) => {
+          let timeoutId;
+          return (...args) => {
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(() => func.apply(this, args), delay);
+          };
+        };
+
+        const debouncedShowHint = debounce((cm) => {
+          cm.showHint({ hint: pythonAnywordHint, completeSingle: false });
+        }, 100);
+
+        // 輸入時觸發自動補全
         editor.on('inputRead', (cm, change) => {
           if (change.origin === '+input' && change.text?.[0]?.match(/\w/)) {
-            cm.showHint({ hint: pythonAnywordHint, completeSingle: false });
+            debouncedShowHint(cm);
           }
         });
 
