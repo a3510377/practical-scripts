@@ -405,8 +405,6 @@ def fibonacci(n):
             ...new Set(ranges.map((r) => [r.head.line, r.anchor.line]).flat()),
           ];
 
-          console.log(linesToSwap);
-
           // 向下時從底部交換，向上時從頂部交換
           linesToSwap.sort((a, b) => (dir > 0 ? b - a : a - b));
           linesToSwap.forEach((line) => {
