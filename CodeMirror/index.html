@@ -86,6 +86,24 @@
         border-radius: 2px;
       }
 
+      /* 縮排輔助線 */
+      .indent-guide {
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: calc(var(--indent-size) * var(--indent));
+        pointer-events: none;
+        background-image: repeating-linear-gradient(
+          to right,
+          #ffffff1a 0,
+          #ffffff1a 1px,
+          transparent 1px,
+          transparent 100%
+        );
+        background-size: var(--indent-size) 100%;
+      }
+
       #statusbar {
         gap: 15px;
         display: flex;
@@ -150,6 +168,17 @@
         background-repeat: no-repeat;
         background-position: right 90%;
         background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="20"><path stroke="%23888" stroke-width="1" fill="none" d="M1 10H196L190 5M190 15L196 10M197 4L197 16"/></svg>');
+      }
+
+      /* 空格 */
+      .cm-space::before {
+        content: '·';
+        color: rgba(255, 255, 255, 0.1);
+      }
+      /* 特殊字符 */
+      .cm-special::before {
+        content: '⦿';
+        color: red;
       }
     </style>
   </head>
@@ -315,23 +344,42 @@
           }
         );
 
+        // 縮排輔助線
+        editor.on('renderLine', (cm, line, elt) => {
+          const text = line.text;
+          const indentUnit = cm.getOption('indentUnit');
+          const indentLevel = Math.ceil(text.search(/\S|$/) / indentUnit);
+
+          if (elt.dataset.indentLevel == indentLevel) return;
+
+          elt.dataset.indentLevel = indentLevel;
+          let guide = elt.querySelector('.indent-guide');
+          if (!guide) {
+            guide = document.createElement('span');
+            guide.className = 'indent-guide';
+            elt.appendChild(guide);
+          }
+          guide.style.setProperty('--indent', indentLevel);
+          guide.style.setProperty(
+            '--indent-size',
+            `${Math.ceil(cm.defaultCharWidth() * indentUnit)}px`
+          );
+        });
+
         // 特殊字元顯示(空格、零寬空格等)
         editor.setOption('specialCharPlaceholder', (ch) => {
-          const span = document.createElement('span');
-
           if (ch === ' ') {
-            span.textContent = '·';
-            span.style.color = 'rgba(255,255,255,0.1)';
+            const span = document.createElement('span');
+            span.className = 'cm-space';
+            return span;
           } else if (
-            /[\u0000-\u001f\u007f-\u009f\u00ad\u061c\u200b\u200e\u200f\u2028\u2029\u202d\u202e\u2066-\u2069\ufeff\ufff9-\ufffc]/.test(
-              ch
-            )
+            /[\u0000-\u001f\u007f-\u009f\u00ad\u061c\u200b]/.test(ch)
           ) {
-            span.textContent = '⦿';
-            span.style.color = 'red';
-          } else span.textContent = ch;
-
-          return span;
+            const span = document.createElement('span');
+            span.className = 'cm-special';
+            return span;
+          }
+          return ch;
         });
 
         // 點擊行號選取整行
