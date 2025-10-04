@@ -53,12 +53,28 @@
         padding-right: 2.2rem;
       }
 
-      .CodeMirror-selectedtext {
+      /* 選取的文字 */
+      span.CodeMirror-selectedtext {
         background-color: #44f6f62c !important;
         font-weight: bold;
-        border-bottom: 1px dashed #44f6f661;
+        border-bottom: 1.1px dashed #44f6f661;
       }
 
+      /* 匹配括號 */
+      .cm-s-dracula .CodeMirror-matchingbracket {
+        outline: 1px solid #ffffff80;
+        font-weight: bold;
+        text-decoration: none;
+      }
+
+      /* 不匹配括號 */
+      .cm-s-dracula .CodeMirror-nonmatchingbracket {
+        color: #ff555580 !important;
+        outline: 2px solid #ff555580;
+        font-weight: bold;
+      }
+
+      /* 匹配的文字 */
       .cm-matchhighlight {
         background-color: #9ecffc2b;
         border-radius: 2px;
