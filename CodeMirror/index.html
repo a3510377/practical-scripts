@@ -20,6 +20,10 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.20/addon/fold/foldgutter.min.css"
     />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.20/addon/search/matchesonscrollbar.min.css"
+    />
 
     <style>
       html,
@@ -47,6 +51,17 @@
 
       .cm-s-dracula.CodeMirror {
         padding-right: 2.2rem;
+      }
+
+      .CodeMirror-selectedtext {
+        background-color: #44f6f62c !important;
+        font-weight: bold;
+        border-bottom: 1px dashed #44f6f661;
+      }
+
+      .cm-matchhighlight {
+        background-color: #9ecffc2b;
+        border-radius: 2px;
       }
 
       #statusbar {
@@ -163,9 +178,10 @@
     <!-- 自動補全 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.20/addon/hint/show-hint.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.20/addon/hint/anyword-hint.min.js"></script>
-    <!-- 多游標編輯 -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.20/addon/selection/mark-selection.min.js"></script>
+    <!-- 高亮括號 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.20/addon/edit/matchbrackets.min.js"></script>
+    <!-- 選取區域 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.20/addon/selection/mark-selection.min.js"></script>
     <!-- 自動閉合括號 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.20/addon/edit/closebrackets.min.js"></script>
     <!-- 搜尋函數 -->
@@ -176,6 +192,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.20/addon/fold/foldcode.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.20/addon/fold/foldgutter.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.20/addon/fold/indent-fold.min.js"></script>
+    <!--  -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.20/addon/search/match-highlighter.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.20/addon/search/matchesonscrollbar.min.js"></script>
 
     <script>
       document.addEventListener('DOMContentLoaded', () => {
@@ -202,10 +221,16 @@
             indentUnit: 4,
             foldGutter: true,
             lineNumbers: true,
+            matchBrackets: true,
             indentWithTabs: false,
             styleActiveLine: true,
+            styleSelectedText: true,
             autoCloseBrackets: true,
             multiCursorOnClick: true,
+            highlightSelectionMatches: {
+              showToken: /\w/,
+              annotateScrollbar: true,
+            },
             hintOptions: { completeSingle: false },
             specialChars:
               /[ \u0000-\u001f\u007f-\u009f\u00ad\u061c\u200b\u200e\u200f\u2028\u2029\u202d\u202e\u2066\u2067\u2069\ufeff\ufff9-\ufffc]/,
