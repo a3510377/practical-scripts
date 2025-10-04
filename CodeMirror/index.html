@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>CodeMirror Python Editor Example</title>
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/codemirror.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/addon/hint/show-hint.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/theme/dracula.min.css"
+    />
+
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+      }
+
+      .editor-container {
+        height: 100%;
+        position: relative;
+      }
+
+      .editor-wrapper {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .cm-s-dracula.CodeMirror,
+      .cm-s-dracula .CodeMirror-gutters {
+        height: 100%;
+      }
+
+      #statusbar {
+        gap: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        height: 2rem;
+        color: #f8f8f2;
+        background: #282a36;
+        font-size: 13px;
+        padding: 4px 10px;
+        font-family: monospace;
+      }
+
+      #editor-instructions {
+        font-size: 10pt;
+        position: absolute;
+        top: 0;
+        right: 0;
+        color: #f8f8f2;
+        padding: 4px;
+        max-width: 250px;
+        border-radius: 0 0 0 8px;
+        background-color: #1b1c20d4;
+      }
+
+      #editor-instructions ul {
+        margin: 0;
+        padding-left: 20px;
+      }
+
+      #editor-instructions .editor-instructions-wrapper > strong {
+        font-size: 14pt;
+      }
+
+      #editor-instructions button {
+        all: unset;
+        cursor: pointer;
+        float: right;
+        font-size: 14pt;
+        line-height: 1;
+        transition: transform 0.3s ease;
+      }
+
+      #editor-instructions.close .editor-instructions-wrapper {
+        display: none;
+      }
+
+      #editor-instructions.close button {
+        transform: rotate(90deg);
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="editor-container">
+      <div class="editor-wrapper">
+        <textarea id="editor"></textarea>
+        <div id="statusbar">
+          <span>行數: <span id="line-number">0</span></span>
+          <span>字數: <span id="char-count">0</span></span>
+          <span>
+            游標: Ln <span id="cursor-line">1</span>, Col
+            <span id="cursor-col">1</span>
+          </span>
+          <span>選取: <span id="selection-count">0</span></span>
+        </div>
+      </div>
+
+      <div id="editor-instructions">
+        <button id="toggle-instructions">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            height="24px"
+            viewBox="0 -960 960 960"
+            width="24px"
+            fill="#e3e3e3"
+          >
+            <path
+              d="M440-800v487L216-537l-56 57 320 320 320-320-56-57-224 224v-487h-80Z"
+            />
+          </svg>
+        </button>
+        <div class="editor-instructions-wrapper">
+          <strong>快捷鍵說明</strong>
+          <ul class="instructions-list">
+            <li><strong>Ctrl + Space</strong>：觸發自動補全</li>
+            <li><strong>Ctrl + Alt + ↑ / ↓</strong>：在上/下添加游標</li>
+            <li><strong>Ctrl + D</strong>：選取下一個相同字串</li>
+            <li><strong>Shift + Ctrl + L</strong>：選取文件中所有相同字串</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== -->
+    <!-- CodeMirror -->
+    <!-- ========== -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.20/codemirror.min.js"></script>
+    <!-- Python -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.20/mode/python/python.min.js"></script>
+    <!-- 自動補全 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.20/addon/hint/show-hint.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.20/addon/hint/anyword-hint.min.js"></script>
+    <!-- 多游標編輯 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/addon/selection/mark-selection.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/addon/edit/matchbrackets.min.js"></script>
+    <!-- 自動閉合括號 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.20/addon/edit/closebrackets.min.js"></script>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const instructions = document.getElementById('editor-instructions');
+        const toggleBtn = document.getElementById('toggle-instructions');
+
+        let open = localStorage.getItem('instructionsOpen') !== 'false';
+        instructions.classList.toggle('close', open);
+
+        toggleBtn.addEventListener('click', () => {
+          open = !open;
+          instructions.classList.toggle('close', open);
+          localStorage.setItem('instructionsOpen', open);
+        });
+      });
+
+      document.addEventListener('DOMContentLoaded', () => {
+        const editor = CodeMirror.fromTextArea(
+          document.getElementById('editor'),
+          {
+            mode: 'python',
+            theme: 'dracula',
+            lineNumbers: true,
+            autoCloseBrackets: true,
+            multiCursorOnClick: true,
+            hintOptions: { completeSingle: false },
+            extraKeys: {
+              'Ctrl-Space': (cm) => {
+                return cm.showHint({
+                  hint: pythonAnywordHint,
+                  completeSingle: false,
+                });
+              },
+              'Ctrl-Alt-Up': (cm) => moveCursors(cm, -1),
+              'Ctrl-Alt-Down': (cm) => moveCursors(cm, 1),
+              'Ctrl-D': (cm) => selectNextOccurrence(cm),
+              'Shift-Ctrl-L': (cm) => selectAllOccurrences(cm),
+            },
+          }
+        );
+
+        // 初始測試代碼
+        const testCode = `# Python test code
+def fibonacci(n):
+    if n == 0:
+        return 0
+    elif n == 1:
+        return 1
+    else:
+        return fibonacci(n - 1) + fibonacci(n - 2)
+# a1
+# a1
+# a1
+# a1
+# a2
+# a2
+# a2
+# a2
+# a2
+`;
+        editor.setValue(testCode);
+
+        // 顯示狀態欄更新
+        const lineNumberSpan = document.getElementById('line-number');
+        const charCountSpan = document.getElementById('char-count');
+        const cursorLineSpan = document.getElementById('cursor-line');
+        const cursorColSpan = document.getElementById('cursor-col');
+        const selectionCountSpan = document.getElementById('selection-count');
+
+        const updateStatus = () => {
+          const text = editor.getValue();
+          const cursor = editor.getCursor();
+          const selLength = editor.getSelection().length;
+
+          lineNumberSpan.textContent = editor.lineCount();
+          charCountSpan.textContent = text.length;
+          cursorLineSpan.textContent = cursor.line + 1;
+          cursorColSpan.textContent = cursor.ch + 1;
+          selectionCountSpan.textContent = selLength;
+        };
+
+        editor.on('changes', updateStatus);
+        editor.on('cursorActivity', updateStatus);
+        updateStatus();
+
+        // 自動補全提示（Python + anyword）
+        const pythonAnywordHint = (cm) => {
+          const cursor = cm.getCursor();
+          const token = cm.getTokenAt(cursor);
+          const word = token.string.slice(0, cursor.ch - token.start);
+          const pythonHints = (CodeMirror.hintWords['python'] || []).filter(
+            (k) => k.startsWith(word)
+          );
+          const anywordHints = CodeMirror.hint.anyword(cm)?.list || [];
+          return {
+            list: [...new Set([...pythonHints, ...anywordHints])].map(
+              (text) => ({ text })
+            ),
+            from: { line: cursor.line, ch: token.start },
+            to: { line: cursor.line, ch: token.end },
+          };
+        };
+
+        editor.on('inputRead', (cm, change) => {
+          if (change.origin === '+input' && change.text?.[0]?.match(/\w/)) {
+            cm.showHint({ hint: pythonAnywordHint, completeSingle: false });
+          }
+        });
+
+        // 移動游標上/下
+        const moveCursors = (cm, dir) => {
+          const ranges = cm.listSelections();
+          const newRanges = ranges.map((r) => {
+            if (dir < 0 && r.head.line > 0) {
+              return {
+                head: { line: r.head.line - 1, ch: r.head.ch },
+                anchor: { line: r.anchor.line - 1, ch: r.anchor.ch },
+              };
+            } else if (dir > 0 && r.head.line < cm.lineCount() - 1) {
+              return {
+                head: { line: r.head.line + 1, ch: r.head.ch },
+                anchor: { line: r.anchor.line + 1, ch: r.anchor.ch },
+              };
+            }
+            return r;
+          });
+          cm.setSelections([...ranges, ...newRanges]);
+        };
+
+        // 選取下一個相同字串
+        const selectNextOccurrence = (cm) => {
+          const ranges = cm.listSelections();
+          ranges.forEach(({ anchor, head }) => {
+            const word = cm.getRange(anchor, head);
+            if (word) {
+              const cursor = cm.getSearchCursor(word, head);
+              if (cursor.findNext()) {
+                cm.addSelection(cursor.from(), cursor.to());
+              }
+            } else {
+              const lineText = cm.getLine(head.line);
+              let left = head.ch;
+              let right = left;
+              while (left > 0 && /\w/.test(lineText[left - 1])) left--;
+              while (right < lineText.length && /\w/.test(lineText[right])) {
+                right++;
+              }
+              cm.setSelection(
+                { line: head.line, ch: left },
+                { line: head.line, ch: right }
+              );
+            }
+          });
+        };
+
+        // 選取文件中所有相同字串
+        const selectAllOccurrences = (cm) => {
+          const ranges = cm.listSelections();
+          ranges.forEach(({ anchor, head }) => {
+            if (head.ch === anchor.ch && head.line === anchor.line) {
+              const lineText = cm.getLine(head.line);
+              let left = head.ch;
+              let right = head.ch;
+              while (left > 0 && /\w/.test(lineText[left - 1])) left--;
+              while (right < lineText.length && /\w/.test(lineText[right])) {
+                right++;
+              }
+
+              cm.setSelection(
+                { line: head.line, ch: left },
+                { line: head.line, ch: right }
+              );
+            }
+            const word = cm.getRange(anchor, head);
+            const cursor = cm.getSearchCursor(word, { line: 0, ch: 0 });
+            while (cursor.findNext()) {
+              cm.addSelection(cursor.from(), cursor.to());
+            }
+          });
+        };
+      });
+    </script>
+  </body>
+</html>
