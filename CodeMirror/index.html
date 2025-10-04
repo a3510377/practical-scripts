@@ -92,7 +92,7 @@
         top: 0;
         left: 3px;
         bottom: 0;
-        width: calc(var(--indent-size) * var(--indent));
+        width: var(--indent-width);
         pointer-events: none;
         background-image: repeating-linear-gradient(
           to right,
@@ -359,10 +359,13 @@
             guide.className = 'indent-guide';
             elt.appendChild(guide);
           }
-          guide.style.setProperty('--indent', indentLevel);
+          guide.style.setProperty(
+            '--indent-width',
+            cm.defaultCharWidth() * indentUnit * indentLevel + 'px'
+          );
           guide.style.setProperty(
             '--indent-size',
-            `${Math.ceil(cm.defaultCharWidth() * indentUnit)}px`
+            cm.defaultCharWidth() * indentUnit + 'px'
           );
         });
 
