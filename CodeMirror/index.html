@@ -10,6 +10,10 @@
     />
     <link
       rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.20/addon/dialog/dialog.min.css"
+    />
+    <link
+      rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.20/addon/hint/show-hint.min.css"
     />
     <link
@@ -19,10 +23,6 @@
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.20/addon/fold/foldgutter.min.css"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.20/addon/search/matchesonscrollbar.min.css"
     />
 
     <style>
@@ -51,6 +51,12 @@
 
       .cm-s-dracula.CodeMirror {
         padding-right: 2.2rem;
+      }
+
+      /* 佔位符 */
+      .CodeMirror-placeholder {
+        color: #b9c1d8 !important;
+        font-style: italic;
       }
 
       /* 選取的文字 */
@@ -100,7 +106,8 @@
         right: 0;
         color: #f8f8f2;
         padding: 4px;
-        max-width: 250px;
+        max-width: 350px;
+        width: 80%;
         border-radius: 0 0 0 8px;
         background-color: #1b1c20d4;
       }
@@ -121,6 +128,10 @@
         font-size: 14pt;
         line-height: 1;
         transition: transform 0.3s ease;
+      }
+
+      #editor-instructions.close {
+        width: auto;
       }
 
       #editor-instructions.close .editor-instructions-wrapper {
@@ -175,11 +186,23 @@
         <div class="editor-instructions-wrapper">
           <strong>快捷鍵說明</strong>
           <ul class="instructions-list">
+            <li><strong>Ctrl + /</strong>：切換註解</li>
             <li><strong>Ctrl + Space</strong>：觸發自動補全</li>
-            <li><strong>Ctrl + Alt + ↑ / ↓</strong>：在上/下添加游標</li>
+            <li>
+              <strong>Ctrl + Enter</strong>：在當前行下方插入新行（保持縮排）
+            </li>
+
+            <li>
+              <strong>Ctrl + Alt + ↑ / ↓</strong>：在上/下添加游標（多游標）
+            </li>
             <li><strong>Alt + ↑ / ↓</strong>：上下交換當前行（支援多游標）</li>
+
             <li><strong>Ctrl + D</strong>：選取下一個相同字串</li>
             <li><strong>Shift + Ctrl + L</strong>：選取文件中所有相同字串</li>
+
+            <li><strong>行號欄點擊</strong>：選取整行（Ctrl 點擊可多選）</li>
+
+            <li><strong>Alt + G</strong>：跳轉至行</li>
           </ul>
         </div>
       </div>
@@ -189,6 +212,10 @@
     <!-- CodeMirror -->
     <!-- ========== -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.20/codemirror.min.js"></script>
+    <!-- 佔位符 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.20/addon/display/placeholder.min.js"></script>
+    <!-- 對話框 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.20/addon/dialog/dialog.min.js"></script>
     <!-- Python -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.20/mode/python/python.min.js"></script>
     <!-- 自動補全 -->
@@ -196,21 +223,23 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.20/addon/hint/anyword-hint.min.js"></script>
     <!-- 高亮括號 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.20/addon/edit/matchbrackets.min.js"></script>
-    <!-- 選取區域 -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.20/addon/selection/mark-selection.min.js"></script>
     <!-- 自動閉合括號 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.20/addon/edit/closebrackets.min.js"></script>
-    <!-- 搜尋函數 -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.20/addon/search/searchcursor.min.js"></script>
     <!-- 行高亮 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.20/addon/selection/active-line.min.js"></script>
+    <!-- 選取區域 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.20/addon/selection/mark-selection.min.js"></script>
+    <!-- 搜尋函數 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.20/addon/search/searchcursor.min.js"></script>
+    <!-- 高亮顯示搜尋結果 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.20/addon/search/match-highlighter.min.js"></script>
     <!-- 折疊程式碼 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.20/addon/fold/foldcode.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.20/addon/fold/foldgutter.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.20/addon/fold/indent-fold.min.js"></script>
-    <!--  -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.20/addon/search/match-highlighter.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.20/addon/search/matchesonscrollbar.min.js"></script>
+    <!-- 註解 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.20/addon/comment/comment.min.js"></script>
+    <!-- ========== -->
 
     <script>
       document.addEventListener('DOMContentLoaded', () => {
@@ -231,6 +260,7 @@
         const editor = CodeMirror.fromTextArea(
           document.getElementById('editor'),
           {
+            placeholder: '打這裡！！',
             mode: 'python',
             theme: 'dracula',
             tabSize: 4,
@@ -252,6 +282,7 @@
               /[ \u0000-\u001f\u007f-\u009f\u00ad\u061c\u200b\u200e\u200f\u2028\u2029\u202d\u202e\u2066\u2067\u2069\ufeff\ufff9-\ufffc]/,
             gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
             extraKeys: {
+              'Ctrl-/': 'toggleComment',
               'Ctrl-Enter': (cm) => {
                 cm.replaceSelection('\n', 'end');
                 cm.indentLine(cm.getCursor().line);
@@ -268,12 +299,13 @@
               'Shift-Ctrl-L': (cm) => selectAllOccurrences(cm),
               'Alt-Up': (cm) => swapLine(cm, -1),
               'Alt-Down': (cm) => swapLine(cm, 1),
+              'Ctrl-G': (cm) => jumpToLine(cm),
             },
           }
         );
 
         // 特殊字元顯示(空格、零寬空格等)
-        editor.setOption('specialCharPlaceholder', function (ch) {
+        editor.setOption('specialCharPlaceholder', (ch) => {
           const span = document.createElement('span');
 
           if (ch === ' ') {
@@ -289,6 +321,29 @@
           } else span.textContent = ch;
 
           return span;
+        });
+
+        // 點擊行號選取整行
+        editor.on('gutterClick', (cm, line, _, event) => {
+          const start = { line, ch: 0 };
+          const end = { line, ch: cm.getLine(line).length };
+
+          if (!event.ctrlKey) return cm.setSelection(start, end);
+
+          let found = false;
+          const newRanges = cm.listSelections().filter(({ anchor, head }) => {
+            const from = Math.min(anchor.line, head.line);
+            const to = Math.max(anchor.line, head.line);
+
+            if (line >= from && line <= to) {
+              found = true;
+              return false;
+            }
+            return true;
+          });
+
+          if (!found) newRanges.push({ anchor: start, head: end });
+          cm.setSelections(newRanges);
         });
 
         // 初始測試代碼
@@ -473,6 +528,32 @@ def fibonacci(n):
             anchor: { line: r.anchor.line + dir, ch: r.anchor.ch },
           }));
           cm.setSelections(newSelections);
+        };
+
+        // 跳至行
+        // edit from: https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.20/addon/search/jump-to-line.js
+        const jumpToLine = (cm) => {
+          const cur = cm.getCursor();
+
+          const interpretLine = (str) => {
+            const num = +str;
+            return /^[-+]/.test(str) ? cur.line + num : num - 1;
+          };
+
+          cm.openDialog(
+            `跳轉至行： <input type='text' style='width: 10em' class='CodeMirror-search-field'/><span style='color:#888' class='CodeMirror-search-hint'>(可使用 line:column 或 line)</span>`,
+            (posStr) => {
+              if (!posStr) return;
+
+              let match;
+              if ((match = /^\s*([-+]?\d+)\s*:\s*(\d+)\s*$/.exec(posStr))) {
+                cm.setCursor(interpretLine(match[1]), Number(match[2]));
+              } else if ((match = /^\s*:?\s*([-+]?\d+)\s*/.exec(posStr))) {
+                cm.setCursor(interpretLine(match[1]), cur.ch);
+              }
+            },
+            { value: `${cur.line + 1}:${cur.ch}` }
+          );
         };
       });
     </script>
